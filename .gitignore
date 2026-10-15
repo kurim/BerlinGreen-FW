@@ -4,6 +4,7 @@ __pycache__/
 esphome/secrets.yaml
 esphome/.esphome/
 *.bin
+!docs/firmware/*.bin
 *.elf
 work/
 analysis/
