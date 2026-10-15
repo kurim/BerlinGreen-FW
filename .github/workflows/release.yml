@@ -31,7 +31,9 @@ jobs:
       - name: Collect assets
         run: |
           mkdir out
-          cp firmware/.pio/build/greenbox/firmware.bin out/firmware.bin
+          B=firmware/.pio/build/greenbox
+          cp $B/firmware.bin $B/bootloader.bin $B/partitions.bin out/
+          cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin out/
           printf '%s' "${{ steps.ver.outputs.version }}" > out/version.txt
           sha256sum out/firmware.bin > out/firmware.bin.sha256
       - uses: actions/upload-artifact@v4

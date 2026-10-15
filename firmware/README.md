@@ -20,6 +20,8 @@ Fallback-AP, WebUI, MQTT und eine konfigurierbare OTA-URL.
 ```bash
 ~/tools/venv/bin/pio run                 # -> .pio/build/greenbox/firmware.bin
 ./flash.sh /dev/ttyUSB0                  # UART; NVS (WLAN-Daten) bleibt erhalten
+flash.cmd COM3                           # Windows (Python + `pip install esptool`)
+# beide akzeptieren optional ein Verzeichnis mit den Release-Dateien (firmware.bin, bootloader.bin, partitions.bin, boot_app0.bin)
 ```
 Partitionstabelle ist identisch zum Werkszustand. Rueckweg: `esptool write_flash 0 berlingreen.bin`.
 Erster Flash muss per UART/TC2030 erfolgen (die Werks-OTA akzeptiert nur ihr eigenes Zertifikat).
