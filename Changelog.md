@@ -5,15 +5,17 @@ Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich 
 
 ## [Unreleased]
 
+### Geplant
+- MQTT-Transport im HA-Addon/der HA-Integration `greenbox`
+
+## [5.0.1] - 2026-10-15
+
 ### Hinzugefügt
 - Default-OTA-URL zeigt auf `https://github.com/kurim/BerlinGreen-FW/releases/latest/download/firmware.bin`
 - GitHub-Actions-Workflow `release.yml`: baut bei Tag `v*` und veröffentlicht `firmware.bin` + `version.txt`
 
 - `flash.cmd` für Windows; `flash.sh`/`flash.cmd` nehmen optional ein Verzeichnis mit Release-Dateien entgegen
 - Release enthält zusätzlich `bootloader.bin`, `partitions.bin`, `boot_app0.bin` für den Erstflash
-
-### Geplant
-- MQTT-Transport im HA-Addon/der HA-Integration `greenbox`
 
 ## [5.0.0] - 2026-10-15
 
