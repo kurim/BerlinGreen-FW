@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PlatformIO
+        run: pip install platformio
+      - name: Version from tag
+        id: ver
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          if [ "${GITHUB_REF_TYPE}" != "tag" ]; then V="$(sed -n 's/#define FW_VERSION "\(.*\)"/\1/p' firmware/src/gb.h)"; fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          sed -i "s/#define FW_VERSION \".*\"/#define FW_VERSION \"$V\"/" firmware/src/gb.h
+      - name: Build
+        working-directory: firmware
+        run: pio run
+      - name: Collect assets
+        run: |
+          mkdir out
+          cp firmware/.pio/build/greenbox/firmware.bin out/firmware.bin
+          printf '%s' "${{ steps.ver.outputs.version }}" > out/version.txt
+          sha256sum out/firmware.bin > out/firmware.bin.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: greenbox-firmware
+          path: out/*
+      - name: Release notes
+        if: github.ref_type == 'tag'
+        run: |
+          awk -v v="${{ steps.ver.outputs.version }}" '$0 ~ "^## \\[" v "\\]" {f=1; next} /^## \[/ {f=0} f' Changelog.md > notes.md
+          [ -s notes.md ] || echo "GreenBox firmware ${{ steps.ver.outputs.version }}" > notes.md
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: notes.md
+          files: out/*

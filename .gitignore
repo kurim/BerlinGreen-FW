@@ -1,0 +1,9 @@
+.pio/
+.venv/
+__pycache__/
+esphome/secrets.yaml
+esphome/.esphome/
+*.bin
+*.elf
+work/
+analysis/

@@ -1,0 +1,218 @@
+# BerlinGreen GreenBox -> ESPHome
+# Pins aus Firmware-Analyse (Ghidra, Stock app1). Siehe ../BerlinGreen_GreenBox_RE.md, Abschnitt 8.
+#   Stripe1/2/3 = GPIO23/22/21 (LEDC, 25 kHz)   Wasserstand-Pads = GPIO14/27/13 (Touch)   Taster = GPIO12 (Touch)
+esphome:
+  name: greenbox
+  friendly_name: GreenBox
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+api:
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "GreenBox-Setup"
+    password: !secret ap_password
+captive_portal:
+web_server:
+  port: 80
+
+time:
+  - platform: homeassistant
+    id: ha_time
+    timezone: Europe/Berlin
+
+# ---------------------------------------------------------------- LED-Streifen
+output:
+  - platform: ledc
+    id: out_stripe1
+    pin: GPIO23
+    frequency: 25000Hz
+  - platform: ledc
+    id: out_stripe2
+    pin: GPIO22
+    frequency: 25000Hz
+  - platform: ledc
+    id: out_stripe3
+    pin: GPIO21
+    frequency: 25000Hz
+
+light:
+  - platform: monochromatic
+    id: stripe1
+    name: "Stripe 1"
+    output: out_stripe1
+    default_transition_length: 1s
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: monochromatic
+    id: stripe2
+    name: "Stripe 2"
+    output: out_stripe2
+    default_transition_length: 1s
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: monochromatic
+    id: stripe3
+    name: "Stripe 3"
+    output: out_stripe3
+    default_transition_length: 1s
+    restore_mode: RESTORE_DEFAULT_OFF
+
+# ---------------------------------------------------------------- Touch: Wasserstand + Taster
+# Stock: Pad "benetzt/beruehrt" = niedriger Rohwert (Schwelle ~10). Rohwerte erst im Log pruefen
+# (setup_mode), dann die threshold-Werte anpassen und setup_mode abschalten.
+esp32_touch:
+  setup_mode: true
+  # Typ. Ablauf: Log "Touch Pad 'X' value" lesen (trocken vs. nass) und Mitte als threshold setzen.
+
+binary_sensor:
+  - platform: esp32_touch
+    id: pad_water_a
+    name: "Wasser Pad A (GPIO14)"
+    pin: GPIO14
+    threshold: 10
+    internal: true
+  - platform: esp32_touch
+    id: pad_water_b
+    name: "Wasser Pad B (GPIO27)"
+    pin: GPIO27
+    threshold: 10
+    internal: true
+  - platform: esp32_touch
+    id: pad_water_c
+    name: "Wasser Pad C (GPIO13)"
+    pin: GPIO13
+    threshold: 10
+    internal: true
+  # Touch-Taster IO12 (Modul-Pin 14): Pad mit Guard-Ring unter dem Gehaeuse
+  - platform: esp32_touch
+    id: pad_button
+    name: "Taster (IO12)"
+    pin: GPIO12
+    threshold: 40   # Platzhalter: per Log kalibrieren (Original: Baseline-5)
+    on_press:
+      # wie Stock: Override zwischen EIN/AUS umschalten
+      - select.set:
+          id: mode
+          option: !lambda |-
+            return id(mode).state == "AUS" ? "EIN" : "AUS";
+
+  - platform: template
+    name: "Wasser niedrig"
+    device_class: problem
+    lambda: |-
+      return id(water_level).has_state() && id(water_level).state <= 20;
+
+sensor:
+  # Logik wie Stock: A<th & B<th & C<th -> 100 %, A&B -> 50 %, nur A -> 20 %, sonst 0 %
+  - platform: template
+    id: water_level
+    name: "Wasserstand"
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    update_interval: 5s
+    lambda: |-
+      bool a = id(pad_water_a).state, b = id(pad_water_b).state, c = id(pad_water_c).state;
+      if (a && b && c)       return 100;
+      if (a && b)            return 50;
+      if (a && !b && !c)     return 20;
+      return 0;
+
+# ---------------------------------------------------------------- Zeitplan (Stock-Logik)
+select:
+  - platform: template
+    id: mode
+    name: "Modus"
+    options: ["AUTO", "EIN", "AUS"]
+    initial_option: "AUTO"
+    optimistic: true
+    restore_value: true
+    on_value:
+      - script.execute: apply_mode
+
+datetime:
+  - platform: template
+    id: start_weekday
+    name: "Start Werktag"
+    type: time
+    optimistic: true
+    restore_value: true
+    initial_value: "18:00:00"
+  - platform: template
+    id: start_weekend
+    name: "Start Wochenende"
+    type: time
+    optimistic: true
+    restore_value: true
+    initial_value: "18:00:00"
+
+number:
+  - platform: template
+    id: duration_weekday
+    name: "Dauer Werktag"
+    unit_of_measurement: "h"
+    min_value: 0
+    max_value: 24
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 6
+  - platform: template
+    id: duration_weekend
+    name: "Dauer Wochenende (0 = wie Werktag)"
+    unit_of_measurement: "h"
+    min_value: 0
+    max_value: 24
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+
+globals:
+  - id: last_schedule_on
+    type: bool
+    initial_value: "false"
+
+script:
+  - id: apply_mode          # EIN/AUS sofort anwenden, AUTO -> Zeitplan auswerten
+    mode: restart
+    then:
+      - lambda: |-
+          auto m = id(mode).state;
+          if (m == "EIN") {
+            id(stripe1).turn_on().perform(); id(stripe2).turn_on().perform(); id(stripe3).turn_on().perform();
+          } else if (m == "AUS") {
+            id(stripe1).turn_off().perform(); id(stripe2).turn_off().perform(); id(stripe3).turn_off().perform();
+          } else {
+            id(last_schedule_on) = !id(last_schedule_on);   // erzwingt Neuauswertung im naechsten Tick
+          }
+
+interval:
+  - interval: 20s         # Stock wertet alle 20 ms aus; 20 s reichen fuer Minutengenauigkeit
+    then:
+      - lambda: |-
+          if (id(mode).state != "AUTO") return;
+          auto now = id(ha_time).now();
+          if (!now.is_valid()) return;     // Stock: "Light shedule skipped since time is not set"
+          bool weekend = (now.day_of_week == 1 || now.day_of_week == 7) && id(duration_weekend).state != 0;
+          int sh = weekend ? id(start_weekend).hour   : id(start_weekday).hour;
+          int sm = weekend ? id(start_weekend).minute : id(start_weekday).minute;
+          int dur = (int) (weekend ? id(duration_weekend).state : id(duration_weekday).state);
+          int start = sh * 60 + sm, end = start + dur * 60, cur = now.hour * 60 + now.minute;
+          bool on;
+          if (dur == 0)            on = false;
+          else if (end <= 1440)    on = cur >= start && cur < end;
+          else                     on = cur >= start || cur < end - 1440;   // ueber Mitternacht
+          if (on != id(last_schedule_on)) {
+            id(last_schedule_on) = on;
+            if (on) { id(stripe1).turn_on().perform(); id(stripe2).turn_on().perform(); id(stripe3).turn_on().perform(); }
+            else    { id(stripe1).turn_off().perform(); id(stripe2).turn_off().perform(); id(stripe3).turn_off().perform(); }
+          }
