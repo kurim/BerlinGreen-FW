@@ -10,7 +10,8 @@ Fallback-AP, WebUI, MQTT und eine konfigurierbare OTA-URL.
 | Persistenz | Alles (Streifen, Zeitplan, Override, Blinken, WLAN, MQTT ...) liegt im NVS. Das Original hielt den Zeitplan nur im RAM. |
 | Zeit | NTP, sobald WLAN steht (kein Neu-Verbinden der App nach Stromausfall noetig). Ohne Zeit: Streifen 1 "atmet" wie im Original. |
 | WLAN | STA; Zugang wird beim ersten Start aus der Werks-Firmware (NVS-`eeprom`) uebernommen. Kein/kein funktionierendes WLAN -> AP `GreenBox-Setup` (Standard-Passwort `greenbox`, **aendern**), Captive Portal auf `192.168.4.1`. |
-| WebUI | `http://greenbox.local/` bzw. IP. Optionales Passwort (Benutzer `admin`). |
+| Hostname | Standard `GreenBox` + erste 4 MAC-Bytes (z. B. `GreenBox8C4B14C8`), eindeutig pro Geraet, aenderbar (`hostname`). |
+| WebUI | `http://<hostname>.local/` bzw. IP. Optionales Passwort (Benutzer `admin`). |
 | OTA | URL im WebUI / `ota_url`. Standard: `https://github.com/kurim/BerlinGreen-FW/releases/latest/download/firmware.bin`. TLS wird geprueft (eingebettete Root-CAs: ISRG, DigiCert G2, USERTrust, Sectigo, GTS, Amazon). Version-Check: `version.txt` im selben Verzeichnis wie die `.bin` (nur Versionsstring, z. B. `5.0.1`). Taeglich-Auto optional. App-Befehl `U` loest ebenfalls OTA aus. |
 
 ## Standard-URL fuer dein Repo setzen
@@ -55,7 +56,9 @@ Hinweis zu Zeiten: `start*` sind in der Zeitbasis der Box (bei `fw_byte` 3 = UTC
 Ortszeit <-> UTC umrechnen.
 
 ## Pins (aus der Werks-Firmware)
-Stripes GPIO 23/22/21 (LEDC 25 kHz, 11 Bit), Wasser Touch GPIO 14/27/13. GPIO 12 (IO12, Modul-Pin 14) ist der Touch-Taster: Kupfer-Pad mit Guard-Ring unter dem Gehaeuse, ueber 510 Ohm angebunden. In dieser Firmware standardmaessig an (`button`), Schwelle `button_delta`, Live-Werte im WebUI.
+Stripes GPIO 23/22/21 (LEDC 25 kHz, 11 Bit), Wasser Touch GPIO 14/27/13 (unten/mitte/oben). GPIO 12 (IO12, Modul-Pin 14) ist der Touch-Taster: Kupfer-Pad mit Guard-Ring unter dem Gehaeuse, ueber 510 Ohm angebunden — bei manchen Gehaeusen von aussen nicht erreichbar, daher per `button` abschaltbar. Standardmaessig an, Schwelle `button_delta` (Standard 5; am Testgeraet trocken ~83, beruehrt ~23 -> 20-25 ist ein robuster Wert), Live-Werte im WebUI.
+
+"Bei wenig Wasser blinken" (`blink`): kurzes Abdunkeln, wenn der Pegel <= 20 % ist (0 oder 20 %).
 
 ## Nicht getestet
 Gebaut und als Image validiert, aber **noch nicht auf Hardware getestet**. Erst mit niedriger Helligkeit pruefen.

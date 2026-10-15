@@ -21,7 +21,7 @@ struct Cfg {
   String   tz         = "CET-1CEST,M3.5.0,M10.5.0/3";  // nur bei fwByte >= 4
   // WLAN
   String   ssid, pass;
-  String   hostname   = "greenbox";
+  String   hostname;                      // leer = "GreenBox" + erste 4 MAC-Bytes, z.B. GreenBox8C4B14C8 (siehe macId())
   String   apPass     = "greenbox";       // Fallback-AP "GreenBox-Setup" (>= 8 Zeichen)
   String   webPass;                       // leer = kein Passwort (Benutzer: admin)
   // OTA

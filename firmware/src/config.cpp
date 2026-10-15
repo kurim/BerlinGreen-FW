@@ -20,6 +20,15 @@ String macId() {
   return String(b);
 }
 
+// Default-Hostname wie im Original-Namensschema: "GreenBox" + erste 4 MAC-Bytes (z.B. GreenBox8C4B14C8).
+static String defaultHostname() {
+  uint8_t m[6];
+  WiFi.macAddress(m);
+  char b[9];
+  snprintf(b, sizeof b, "%02X%02X%02X%02X", m[0], m[1], m[2], m[3]);
+  return "GreenBox" + String(b);
+}
+
 // ---------------------------------------------------------------- persistence
 static void migrateStockEeprom() {
   // Original-Firmware: Arduino-EEPROM (NVS-Namespace "eeprom"), 256 Byte.
@@ -79,6 +88,10 @@ void cfgLoad() {
     cfg.mqttBase = prefs.getString("mqbase", "");
   }
   if (cfg.apPass.length() < 8) cfg.apPass = "greenbox";
+  if (cfg.hostname.length() == 0 || cfg.hostname == "greenbox") {  // leer (Erststart) oder alter Fix-Default (Upgrade)
+    cfg.hostname = defaultHostname();
+    dirty = true; dirtySince = millis();
+  }
   applyTz();
 }
 

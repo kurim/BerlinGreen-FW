@@ -72,7 +72,7 @@ static void waterCheck() {
     else lvl = 50;
   } else lvl = 20;
   live.water = lvl;
-  live.lowWater = (lvl < 21 && a < 51 && b < 51 && c < 51 && cfg.blink);
+  live.lowWater = (lvl <= 20 && cfg.blink);
   if (live.lowWater && cfg.override_ != 0 && on) dipUntil = millis() + 700;   // kurzes Abdunkeln = "Blinken"
 }
 
