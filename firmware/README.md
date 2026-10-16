@@ -27,6 +27,27 @@ flash.cmd COM3                           # Windows (Python + `pip install esptoo
 Partitionstabelle ist identisch zum Werkszustand. Rueckweg: `esptool write_flash 0 berlingreen.bin`.
 Erster Flash muss per UART/TC2030 erfolgen (die Werks-OTA akzeptiert nur ihr eigenes Zertifikat).
 
+### Pinbelegung Flash-Header (TC2030)
+
+```
+   ●       ●
+[6] IO0   [5] RXD
+[4] GND   [3] TXD
+[2] 3V3   [1] EN
+        ●
+```
+
+Passender Clip/Adapter an UART-USB-Wandler, kein Anloeten am Chip noetig.
+
+| Pin | Funktion | an UART-Wandler |
+|---|---|---|
+| 1 | EN (Reset) | - (nur beim Flashen ggf. per Taster/DTR beschalten) |
+| 2 | 3V3 | 3V3 (nur wenn die Box nicht separat mit Strom versorgt wird) |
+| 3 | TXD (Box -> Wandler) | RXD |
+| 4 | GND | GND |
+| 5 | RXD (Wandler -> Box) | TXD |
+| 6 | IO0 (Boot-Modus) | - (fuer Download-Modus beim Verbinden gegen GND ziehen) |
+
 ## MQTT
 Aktivieren im WebUI (Host/Port/User/Passwort). Basis `<base>` = Einstellung `mqtt_base`, sonst `greenbox/<mac ohne :>`.
 
