@@ -1,6 +1,6 @@
 {
   "name": "GreenBox Custom Firmware",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "new_install_prompt_erase": true,
   "builds": [
     {
