@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich 
 
 ## [Unreleased]
 
+## [5.0.3] - 2026-10-16
+
 ### Hinzugefügt
 - WebUI: Speicher-Bestätigung (Toast) nach jedem "Speichern"-Klick (Zeitplan, OTA, MQTT, System), damit erkennbar
   ist, ob das Setzen tatsächlich geklappt hat
