@@ -1,9 +1,11 @@
 # Changelog
 
 Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich an
-[Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionierung nach [SemVer](https://semver.org/lang/de/).
+[Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen zählen wie bei Home Assistant: `JAHR.MONAT.PATCH` (bis 5.0.4 SemVer).
 
-## [Unreleased]
+## [2026.10.0] - 2026-10-16
+
+Ab dieser Version zählt die Firmware-Version wie die HA-Integration: `JAHR.MONAT.PATCH`. Der Release-Tag lautet `v2026.10.0`; die OTA-Prüfung vergleicht nur auf Ungleichheit, die neue Zählung braucht also keine Anpassung.
 
 ### Geändert
 - PlatformIO-Plattform `espressif32` 6.5.0 -> 6.13.0 (Arduino-ESP32 2.0.14 -> 2.0.17, gleiche 2.0.x-Linie, keine Code-Änderung). Noch nicht auf Hardware getestet
