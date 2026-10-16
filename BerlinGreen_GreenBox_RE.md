@@ -295,11 +295,11 @@ Falls du die Stockfirmware behalten willst: BLE sniffen und `GreenBox` von HA au
 
 ## 10. Offene Punkte / To-do
 
-- [ ] GPIO-Tabelle (Abschnitt 8) ausfüllen
-- [ ] BLE-Paketformat (`0xFF04`) per Sniff dekodieren — optional, nur falls Stock-Kompatibilität gewünscht
-- [ ] Temperatur-Sensortyp klären
-- [ ] Partition-Scheme für Custom-Firmware festlegen
-- [ ] ESPHome-Config mit echten GPIOs testen
+- [x] GPIO-Tabelle (Abschnitt 8) ausfüllen — geklärt, Tabelle oben ist vollständig
+- [ ] BLE-Paketformat (`0xFF04`) per Sniff dekodieren — bewusst offen gelassen: die Custom-Firmware erweitert die bestehende Stock-Firmware nur um neue Features, BLE bleibt kompatibel
+- [x] Temperatur-Sensortyp klären — entfällt: in dieser Hardware-Version gibt es keinen Temperatursensor (toter Code)
+- [x] Partition-Scheme für Custom-Firmware festlegen — bestehende Partitionstabelle des Werkszustands übernommen
+- [ ] ESPHome-Config mit echten GPIOs testen — offen
 - [ ] Werks-Backup an sicherem Ort ablegen (mit SHA256 notiert)
 
 ### Verifizierte Fakten (SHA256 des Dumps)
