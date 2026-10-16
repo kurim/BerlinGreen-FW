@@ -5,6 +5,9 @@ Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich 
 
 ## [Unreleased]
 
+### Geändert
+- PlatformIO-Plattform `espressif32` 6.5.0 -> 6.13.0 (Arduino-ESP32 2.0.14 -> 2.0.17, gleiche 2.0.x-Linie, keine Code-Änderung). Noch nicht auf Hardware getestet
+
 ## [5.0.4] - 2026-10-16
 
 ### Geändert
