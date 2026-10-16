@@ -70,19 +70,16 @@
 
 Advertising-Name: **`GreenBox`**. Ein GATT-Service mit sechs Characteristics `0xFF01`–`0xFF06` (Basis-UUID `0000FFxx-0000-1000-8000-00805f9b34fb`), plus Service-UUID-Kennung `0x00FF`.
 
-| UUID | vermutete Funktion (aus Log-Strings abgeleitet) |
+| UUID | Funktion |
 |---|---|
-| `0xFF01` | WiFi-AP-Liste lesen (`Get Wifi AP LIst Chara`, `Send WifiAPCharacteristics Notify`) |
-| `0xFF02` | WiFi-Zugangsdaten setzen (`Set Wifi AP LIst Chara`) |
-| `0xFF03` | WiFi-Status / `Send GetWifiCharacteristics Notify` |
-| `0xFF04` | Kommando-Characteristic (`Write on SimpleBLE Characteristic`) |
-| `0xFF05` | Wasserstand-Notify (`waterNotifyIfChanged`) |
-| `0xFF06` | weitere Statuswerte |
+| `0xFF01` | WLAN-Scan: `gimme` schreiben, Liste lesen |
+| `0xFF02` | WLAN-Zugang setzen: `SSID,Passwort` |
+| `0xFF03` | WLAN-Status: `["c","SSID",rssi]` / `["d"]` |
+| `0xFF05` | Kommandos (write) + Statusstrom (notify) |
+| `0xFF06` | Config `blink,lowWater,plus` |
+| `0xFF07`–`0xFF09` | nur in der V4-Firmware (OTA-Status, Info, Zeitzone) |
 
-> ⚠️ **Korrektur:** Die obige Zuordnung (insb. `0xFF04` als Kommando-Characteristic) war eine Vermutung und ist **falsch**.
-> Aus dem Decompile (Vtables der Characteristic-Callbacks) und `PROTOCOL.md`: `FF01` WLAN-Scan (`gimme` schreiben, lesen),
-> `FF02` WLAN-Zugang `SSID,Passwort`, `FF03` WLAN-Status (`["c","SSID",rssi]` / `["d"]`), **`FF05` Kommandos (write) + Statusstrom (notify)**,
-> `FF06` Config `blink,lowWater,plus`. `FF04` existiert nicht; `FF07–FF09` nur in V4-Firmware. Details: `PROTOCOL.md`.
+`0xFF04` existiert nicht. Aus dem Decompile (Vtables der Characteristic-Callbacks); Details und Framing in [`PROTOCOL.md`](PROTOCOL.md).
 
 **Paketformat:** Beim Schreiben werden **Länge, Struktur und Checksumme** geprüft
 (`received wrong packet`, `received wrong checksum`). Es gibt also ein kleines Binärprotokoll mit Prüfsumme — das genaue Format muss gesniffed werden.
@@ -296,7 +293,7 @@ Falls du die Stockfirmware behalten willst: BLE sniffen und `GreenBox` von HA au
 ## 10. Offene Punkte / To-do
 
 - [x] GPIO-Tabelle (Abschnitt 8) ausfüllen — geklärt, Tabelle oben ist vollständig
-- [ ] BLE-Paketformat (`0xFF04`) per Sniff dekodieren — bewusst offen gelassen: die Custom-Firmware erweitert die bestehende Stock-Firmware nur um neue Features, BLE bleibt kompatibel
+- [ ] BLE-Paketformat (Kommandos auf `0xFF05`) per Sniff verifizieren — bewusst offen gelassen: die Custom-Firmware erweitert die bestehende Stock-Firmware nur um neue Features, BLE bleibt kompatibel
 - [x] Temperatur-Sensortyp klären — entfällt: in dieser Hardware-Version gibt es keinen Temperatursensor (toter Code)
 - [x] Partition-Scheme für Custom-Firmware festlegen — bestehende Partitionstabelle des Werkszustands übernommen
 - [ ] ESPHome-Config mit echten GPIOs testen — offen
