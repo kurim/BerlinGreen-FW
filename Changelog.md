@@ -5,8 +5,10 @@ Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich 
 
 ## [Unreleased]
 
-### Geplant
-- MQTT-Transport im HA-Addon/der HA-Integration `greenbox`
+### Hinzugefügt
+- WebUI: Speicher-Bestätigung (Toast) nach jedem "Speichern"-Klick (Zeitplan, OTA, MQTT, System), damit erkennbar
+  ist, ob das Setzen tatsächlich geklappt hat
+- WebUI: eigenes Favicon statt Browser-Standard
 
 ## [5.0.2] - 2026-10-15
 
