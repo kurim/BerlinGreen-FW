@@ -2,6 +2,11 @@
 #include <Preferences.h>
 #include <EEPROM.h>
 #include <WiFi.h>
+#if __has_include(<esp_mac.h>)
+#include <esp_mac.h>
+#else
+#include <esp_system.h>
+#endif
 #include <sys/time.h>
 #include <time.h>
 
@@ -11,6 +16,15 @@ Live live;
 static Preferences prefs;
 static bool dirty = false;
 static uint32_t dirtySince = 0;
+
+// Bluetooth-Adresse (Basis-MAC + 2): Kennung der Box in der App-Cloud, damit HA MQTT- und Cloud-Box zuordnen kann
+static String bleAddress() {
+  uint8_t m[6];
+  esp_read_mac(m, ESP_MAC_BT);
+  char b[18];
+  snprintf(b, sizeof b, "%02X:%02X:%02X:%02X:%02X:%02X", m[0], m[1], m[2], m[3], m[4], m[5]);
+  return String(b);
+}
 
 String macId() {
   uint8_t m[6];
@@ -189,7 +203,7 @@ String stateJson() {
   j += ",\"touch_base\":" + String(live.btnBase) + ",\"button_pressed\":" + String(live.btnPressed ? "true" : "false");
   j += ",\"time_valid\":" + String(live.timeValid ? "true" : "false");
   j += ",\"time\":" + String((uint32_t)time(nullptr));
-  j += ",\"fw\":\"" FW_VERSION "\",\"fw_byte\":" + String(cfg.fwByte);
+  j += ",\"fw\":\"" FW_VERSION "\",\"fw_byte\":" + String(cfg.fwByte) + ",\"ble\":\"" + bleAddress() + "\"";
   j += ",\"tz\":\"" + jesc(cfg.tz) + "\"";
   j += ",\"wifi\":{\"connected\":" + String(netConnected() ? "true" : "false") +
        ",\"ssid\":\"" + jesc(netSsid()) + "\",\"rssi\":" + String(netRssi()) +
