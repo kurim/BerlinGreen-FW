@@ -11,7 +11,7 @@ BerlinGreen-App).
 
 | | [`firmware/`](firmware/) | [`esphome/`](esphome/) |
 |---|---|---|
-| Basis | Eigene PlatformIO-Firmware (Arduino-ESP32 2.0.14) | ESPHome-YAML |
+| Basis | Eigene PlatformIO-Firmware (Arduino-ESP32 2.0.17) | ESPHome-YAML |
 | BLE (App-Kompatibilität) | ✅ vollständig (Service `0x00FF`, `FF01`–`FF09`) | ❌ nicht enthalten |
 | WLAN + Fallback-AP | ✅ | ✅ |
 | WebUI | ✅ eigene Seite, inkl. Live-Ansicht der Touch-Sensoren | ✅ (ESPHome-Standard-UI) |
