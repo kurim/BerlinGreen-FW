@@ -5,6 +5,9 @@ Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich 
 
 ## [Unreleased]
 
+### Geändert
+- `state` (WebUI/MQTT) enthält jetzt `ble` (Bluetooth-Adresse der Box), damit die HA-Integration eine MQTT-Box der App-Cloud zuordnen kann
+
 ## [5.0.3] - 2026-10-16
 
 ### Hinzugefügt
