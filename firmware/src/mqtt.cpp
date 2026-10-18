@@ -13,6 +13,7 @@ static WiFiClientSecure secure;
 static PubSubClient mq;
 static uint32_t lastTry = 0, lastPub = 0;
 static String lastStateSent;
+static uint16_t lastBtnSent = 0;
 static String base;
 
 static String baseTopic() {
@@ -52,6 +53,7 @@ void mqttPublishState() {
   String s = stateJson();
   mq.publish((base + "/state").c_str(), s.c_str(), true);
   lastStateSent = s;
+  lastBtnSent = live.touch[3];
   lastPub = millis();
 }
 
@@ -92,11 +94,15 @@ void mqttLoop() {
       i = x.indexOf(",\"uptime\"");
       j = x.indexOf(",\"web_password_set\"");
       if (i >= 0 && j > i) x.remove(i, j - i);
+      // nur das Roh-Array der Touch-Werte ausblenden; touch_base und button_pressed bleiben im Vergleich,
+      // damit ein Tastendruck sofort gemeldet wird
       i = x.indexOf("\"touch\":[");
-      j = x.indexOf(",\"time_valid\"");
-      if (i >= 0 && j > i) x.remove(i, j - i);
+      j = x.indexOf(']', i);
+      if (i >= 0 && j > i) x.remove(i, j - i + 1);
       return x;
     };
-    if (strip(s) != strip(lastStateSent) || now - lastPub > 60000) mqttPublishState();
+    // Taster-Rohwert (IO12) fuer den HA-Verlauf: bei Aenderung ab 3 Einheiten melden (hoechstens 1x/s durch die Schleife)
+    bool btnMoved = abs((int)live.touch[3] - (int)lastBtnSent) >= 3;
+    if (btnMoved || strip(s) != strip(lastStateSent) || now - lastPub > 60000) mqttPublishState();
   }
 }
