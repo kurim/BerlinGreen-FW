@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen zählen wie bei Home Assistant: `JAHR.MONAT.PATCH` (bis 5.0.4 SemVer).
 
-## [Unreleased]
+## [2026.10.1] - 2026-10-18
 
 ### Geändert
 - MQTT: Der Taster-Rohwert (`touch[3]`) wird bei Änderung (ab 3 Einheiten) sofort gemeldet, ebenso `button_pressed`/`touch_base`. Bisher blockierte der Vergleich im State alle drei Felder, sie kamen nur alle 60 s. Damit lassen sich in Home Assistant spontane Taster-Auslösungen im Verlauf nachvollziehen
