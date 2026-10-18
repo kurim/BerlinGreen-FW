@@ -3,6 +3,11 @@
 Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen zählen wie bei Home Assistant: `JAHR.MONAT.PATCH` (bis 5.0.4 SemVer).
 
+## [2026.10.2] - 2026-10-18
+
+### Geändert
+- Touch-Taster löst erst aus, wenn der Wert in 3 aufeinanderfolgenden Abtastungen (150 ms) unter Baseline minus Schwelle liegt. Vorher reichte eine einzelne Abtastung, ein Ausreißer schaltete den Lichtmodus ohne Berührung um (An/Aus ohne Nutzer, obwohl der Rohwert im HA-Verlauf konstant blieb)
+
 ## [2026.10.1] - 2026-10-18
 
 ### Geändert
