@@ -1,6 +1,6 @@
 {
   "name": "GreenBox Custom Firmware",
-  "version": "2026.10.1",
+  "version": "2026.10.2",
   "new_install_prompt_erase": true,
   "builds": [
     {
