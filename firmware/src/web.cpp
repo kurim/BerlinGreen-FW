@@ -49,7 +49,8 @@ small{color:var(--mu)}
  <div class="kv"><span>Wasser B (IO27)</span><b id="tb2"></b></div>
  <div class="kv"><span>Wasser C (IO13)</span><b id="tc"></b></div>
  <label>Taster-Schwelle (Original: 5)</label><input type="number" min="1" max="50" id="button_delta">
- <button id="bdsave" class="s">Schwelle speichern</button>
+ <label>Abtastungen in Folge (je 50 ms): <b id="bsv"></b></label><input type="range" min="1" max="10" id="button_samples">
+ <button id="bdsave" class="s">Taster speichern</button>
 </section>
 <section><h2>Zeitplan</h2>
  <small>Zeiten in der Zeitzone der Box (Firmware-Byte &lt; 4: UTC wie Original, sonst lokale Zeit).</small>
@@ -96,7 +97,7 @@ function fillOnce(){const f=['duration','duration_weekend','start','start_weeken
  for(const k of f)$(k).value=S[k]??(S.ota&&S.ota.url&&k=='ota_url'?S.ota.url:'');
  $('ota_url').value=S.ota.url;$('mqtt_host').value=S.mqtt.host;$('mqtt_port').value=S.mqtt.port;$('mqtt_user').value=S.mqtt.user;$('mqtt_base').value=S.mqtt.base;
  $('mqtt_enabled').checked=S.mqtt.enabled;$('mqtt_tls').checked=S.mqtt.tls;$('ota_auto').checked=S.ota.auto;$('ota_insecure').checked=S.ota.insecure;
- $('fwbyte').value=S.fw_byte;$('blink').checked=S.blink_on_low_water;$('button').checked=S.button_enabled;$('button_delta').value=S.button_delta}
+ $('fwbyte').value=S.fw_byte;$('blink').checked=S.blink_on_low_water;$('button').checked=S.button_enabled;$('button_delta').value=S.button_delta;$('button_samples').value=S.button_samples}
 function render(){
  $('ver').textContent='v'+S.fw+' - '+S.id;
  $('lt').textContent=(S.light_on?'an':'aus')+' ('+S.override+')';
@@ -105,6 +106,7 @@ function render(){
  $('mq').textContent=!S.mqtt.enabled?'aus':(S.mqtt.connected?'verbunden':'getrennt');
  $('tm').textContent=S.time_valid?new Date(S.time*1000).toLocaleString():'nicht gesetzt';
  $('tb').textContent=S.touch[3]+' (Baseline '+S.touch_base+')'+(S.button_pressed?' - BERUEHRT':'');$('ta').textContent=S.touch[0];$('tb2').textContent=S.touch[1];$('tc').textContent=S.touch[2];
+ $('bsv').textContent=document.activeElement===$('button_samples')?$('button_samples').value:S.button_samples;
  for(let i=1;i<=3;i++){if(document.activeElement!==$('stripe'+i))$('stripe'+i).value=S['stripe'+i];$('v'+i).textContent=S['stripe'+i]+' %'}
  document.querySelectorAll('[data-o]').forEach(b=>b.className=b.dataset.o==S.override?'':'s');
  $('otabar').style.width=S.ota.progress+'%';$('otamsg').textContent=S.ota.msg+(S.ota.latest?' (neueste: '+S.ota.latest+')':'');
@@ -114,7 +116,8 @@ document.querySelectorAll('[data-o]').forEach(b=>b.onclick=async()=>{S=await pos
 for(let i=1;i<=3;i++)$('stripe'+i).onchange=async e=>{S=await post('/api/set',{['stripe'+i]:e.target.value})||S;render()};
 $('blink').onchange=async e=>{S=await post('/api/set',{blink:e.target.checked?1:0})||S};
 $('button').onchange=async e=>{S=await post('/api/set',{button:e.target.checked?1:0})||S};
-$('bdsave').onclick=async()=>{S=await save('/api/set',{button_delta:$('button_delta').value})||S};
+$('button_samples').oninput=e=>$('bsv').textContent=e.target.value;
+$('bdsave').onclick=async()=>{S=await save('/api/set',{button_delta:$('button_delta').value,button_samples:$('button_samples').value})||S};
 $('sched').onclick=async()=>{S=await save('/api/set',{start:$('start').value,start_weekend:$('start_weekend').value,duration:$('duration').value,duration_weekend:$('duration_weekend').value})||S;render()};
 $('sync').onclick=async()=>{S=await post('/api/set',{time:Math.floor(Date.now()/1000)})||S;render()};
 $('scan').onclick=async()=>{$('wmsg').textContent='suche...';await post('/api/scan');setTimeout(async()=>{const l=await (await fetch('/api/scan')).json();

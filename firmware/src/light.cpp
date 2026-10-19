@@ -13,6 +13,7 @@ static bool     on = false;
 static uint32_t lastTick = 0, lastWater = 0, dipUntil = 0, lockUntil = 0;
 static float    btnBaseF = 0;           // nachlaufende Baseline (EMA)
 static uint32_t lastBtn = 0;
+static uint8_t  btnLow = 0;             // aufeinanderfolgende Abtastungen unter der Schwelle
 
 static int rawFor(uint8_t pct) {
   if (!pct) return 0;
@@ -86,8 +87,10 @@ void lightLoop() {
     lastBtn = now;
     uint16_t v = touchRead(PIN_BUTTON);
     live.touch[3] = v;
-    bool pressed = v + cfg.btnDelta < btnBaseF;
-    if (!pressed) btnBaseF += ((float)v - btnBaseF) / 32.0f;
+    bool below = v + cfg.btnDelta < btnBaseF;
+    btnLow = below ? (btnLow < 255 ? btnLow + 1 : 255) : 0;
+    bool pressed = btnLow >= cfg.btnSamples;  // N Abtastungen (je 50 ms) in Folge: einzelne Ausreisser loesen nicht aus
+    if (!below) btnBaseF += ((float)v - btnBaseF) / 32.0f;
     live.btnBase = (uint16_t)(btnBaseF + 0.5f);
     if (pressed && !live.btnPressed && cfg.button && now > lockUntil) {   // nur steigende Flanke
       lightToggleOverride();
