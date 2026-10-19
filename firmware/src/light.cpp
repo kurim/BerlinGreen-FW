@@ -89,7 +89,7 @@ void lightLoop() {
     live.touch[3] = v;
     bool below = v + cfg.btnDelta < btnBaseF;
     btnLow = below ? (btnLow < 255 ? btnLow + 1 : 255) : 0;
-    bool pressed = btnLow >= 3;               // 3 Abtastungen (150 ms) in Folge: einzelne Ausreisser loesen nicht aus
+    bool pressed = btnLow >= cfg.btnSamples;  // N Abtastungen (je 50 ms) in Folge: einzelne Ausreisser loesen nicht aus
     if (!below) btnBaseF += ((float)v - btnBaseF) / 32.0f;
     live.btnBase = (uint16_t)(btnBaseF + 0.5f);
     if (pressed && !live.btnPressed && cfg.button && now > lockUntil) {   // nur steigende Flanke

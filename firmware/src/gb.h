@@ -15,6 +15,7 @@ struct Cfg {
   uint8_t  override_  = 3;                // 0 aus, 1 an, 3 auto
   bool     blink      = false;            // "bei wenig Wasser blinken"
   bool     button     = true;             // Touch-Taster GPIO12 (IO12 / Modul-Pin 14, Pad unter dem Gehaeuse)
+  uint8_t  btnSamples = 3;                // Abtastungen (je 50 ms) in Folge unter der Schwelle bis zur Ausloesung
   uint8_t  btnDelta   = 5;                // Ausloesung, wenn Wert um > delta unter die Baseline faellt (Original: 5)
   // Kompatibilitaet
   uint8_t  fwByte     = 3;                // 'f' auf ff05: 3 = "2.0.3" (UTC-Semantik), >=4 = lokale Zeit + ff09-TZ

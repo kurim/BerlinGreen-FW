@@ -82,6 +82,7 @@ void cfgLoad() {
     cfg.blink    = prefs.getBool("blink", false);
     cfg.button   = prefs.getBool("btn", true);
     cfg.btnDelta = prefs.getUChar("btnd", 5);
+    cfg.btnSamples = prefs.getUChar("btns", 3);
     cfg.fwByte   = prefs.getUChar("fwb", 3);
     cfg.tz       = prefs.getString("tz", cfg.tz);
     cfg.ssid     = prefs.getString("ssid", "");
@@ -121,6 +122,7 @@ static void cfgSaveNow() {
   prefs.putBool("blink", cfg.blink);
   prefs.putBool("btn", cfg.button);
   prefs.putUChar("btnd", cfg.btnDelta);
+  prefs.putUChar("btns", cfg.btnSamples);
   prefs.putUChar("fwb", cfg.fwByte);
   prefs.putString("tz", cfg.tz);
   prefs.putString("ssid", cfg.ssid);
@@ -198,7 +200,7 @@ String stateJson() {
   j += ",\"water\":" + String(live.water);
   j += ",\"low_water\":" + String(live.lowWater ? "true" : "false");
   j += ",\"blink_on_low_water\":" + String(cfg.blink ? "true" : "false");
-  j += ",\"button_enabled\":" + String(cfg.button ? "true" : "false") + ",\"button_delta\":" + String(cfg.btnDelta);
+  j += ",\"button_enabled\":" + String(cfg.button ? "true" : "false") + ",\"button_delta\":" + String(cfg.btnDelta) + ",\"button_samples\":" + String(cfg.btnSamples);
   j += ",\"touch\":[" + String(live.touch[0]) + "," + String(live.touch[1]) + "," + String(live.touch[2]) + "," + String(live.touch[3]) + "]";
   j += ",\"touch_base\":" + String(live.btnBase) + ",\"button_pressed\":" + String(live.btnPressed ? "true" : "false");
   j += ",\"time_valid\":" + String(live.timeValid ? "true" : "false");
@@ -260,6 +262,7 @@ bool applySetting(const String& key, const String& v) {
   else if (key == "duration_weekend" || key == "dwe") cfg.durWe = constrain(v.toInt(), 0, 24);
   else if (key == "blink") cfg.blink = parseBool(v);
   else if (key == "button") cfg.button = parseBool(v);
+  else if (key == "button_samples") cfg.btnSamples = constrain(v.toInt(), 1, 10);
   else if (key == "button_delta") cfg.btnDelta = constrain(v.toInt(), 1, 50);
   else if (key == "tz") { cfg.tz = v; applyTz(); }
   else if (key == "fwbyte") { cfg.fwByte = constrain(v.toInt(), 1, 9); applyTz(); }
