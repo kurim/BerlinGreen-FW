@@ -194,6 +194,7 @@ String stateJson() {
   j += "{";
   j += "\"stripe1\":" + String(cfg.strip[0]) + ",\"stripe2\":" + String(cfg.strip[1]) + ",\"stripe3\":" + String(cfg.strip[2]);
   j += ",\"override\":\"" + String(ov) + "\"";
+  j += ",\"power\":" + String(lightPowerW(), 1);
   j += ",\"light_on\":" + String(lightIsOn() ? "true" : "false");
   j += ",\"start\":\"" + hhmm(cfg.switchWd) + "\",\"start_weekend\":\"" + hhmm(cfg.switchWe) + "\"";
   j += ",\"duration\":" + String(cfg.durWd) + ",\"duration_weekend\":" + String(cfg.durWe);

@@ -1,5 +1,6 @@
 // LED-Streifen, Zeitplan, Wasserstand, Taster - Logik aus der Original-Firmware (Ghidra: FUN_400d2c48/2d58/3138/3288).
 #include "gb.h"
+#include "power.h"
 #include <time.h>
 
 static const uint8_t PIN_STRIPE[3] = {23, 22, 21};   // LEDC ch0..2
@@ -29,6 +30,13 @@ static uint16_t touchMedian(uint8_t pin, int n = 11) {
 }
 
 bool lightIsOn() { return on; }
+
+// Aus dem tatsaechlichen PWM-Duty (inkl. Fade/Abdunkeln) zurueck auf Streifen-% (Umkehr von rawFor)
+float lightPowerW() {
+  float pct[3];
+  for (int i = 0; i < 3; i++) pct[i] = cur[i] ? (cur[i] - 100) * 100.0f / 1340 : 0;
+  return gbPowerW(pct);
+}
 
 void lightBegin() {
   for (int i = 0; i < 3; i++) {

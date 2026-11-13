@@ -69,6 +69,7 @@ void   setSystemTime(uint32_t unixUtc);
 void lightBegin();
 void lightLoop();
 bool lightIsOn();
+float lightPowerW();          // geschaetzte Leistung in W (power.h)
 void lightToggleOverride();   // Taster / MQTT
 
 // ble.cpp

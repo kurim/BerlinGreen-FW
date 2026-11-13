@@ -4,6 +4,8 @@
 esphome:
   name: greenbox
   friendly_name: GreenBox
+  includes:
+    - ../firmware/src/power.h    # gbPowerW(): Leistungsschaetzung aus der Messreihe
 
 esp32:
   board: esp32dev
@@ -74,6 +76,20 @@ esp32_touch:
   # Typ. Ablauf: Log "Touch Pad 'X' value" lesen (trocken vs. nass) und Mitte als threshold setzen.
 
 binary_sensor:
+  # Geschaetzte Leistung (Netzseite) aus den drei Streifenhelligkeiten, Messreihe siehe firmware/power-measurement.md
+  - platform: template
+    name: "Leistung (geschaetzt)"
+    device_class: power
+    state_class: measurement
+    unit_of_measurement: "W"
+    accuracy_decimals: 1
+    update_interval: 5s
+    lambda: |-
+      float pct[3] = {id(stripe1).current_values.get_brightness() * 100 * id(stripe1).current_values.is_on(),
+                      id(stripe2).current_values.get_brightness() * 100 * id(stripe2).current_values.is_on(),
+                      id(stripe3).current_values.get_brightness() * 100 * id(stripe3).current_values.is_on()};
+      return gbPowerW(pct);
+
   - platform: esp32_touch
     id: pad_water_a
     name: "Wasser Pad A (GPIO14)"
