@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an der GreenBox-Firmware. Format orientiert sich 
 
 ## [Unreleased]
 
+## [2026.11.0] - 2026-11-13
+
 ### Hinzugefügt
 - Geschätzte Leistungsaufnahme in W (`power` in `state`/MQTT/WebUI-JSON, ESPHome: Sensor „Leistung (geschaetzt)“, `device_class: power`). Berechnet aus den tatsächlichen Streifenwerten (inkl. Fade) mit den Stützpunkten der Messreihe (`firmware/power-measurement.md`, `firmware/src/power.h`). Abweichung zu den Messpunkten höchstens ca. 1 W; die Box kennt keine Farbtemperatur, die Schätzung arbeitet daher je Streifen (warm/neutral/kalt) statt je Farbtemperatur. Nicht auf Hardware getestet
 
